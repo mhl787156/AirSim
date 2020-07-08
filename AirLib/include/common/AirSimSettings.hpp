@@ -40,9 +40,10 @@ public: //types
         ImageType image_type;
         bool visible;
         std::string camera_name;
+        std::string vehicle_name;
 
-        SubwindowSetting(int window_index_val = 0, ImageType image_type_val = ImageType::Scene, bool visible_val = false, const std::string& camera_name_val = "")
-            : window_index(window_index_val), image_type(image_type_val), visible(visible_val), camera_name(camera_name_val)
+        SubwindowSetting(int window_index_val = 0, ImageType image_type_val = ImageType::Scene, bool visible_val = false, const std::string& camera_name_val = "", const std::string& vehicle_name_val = "")
+            : window_index(window_index_val), image_type(image_type_val), visible(visible_val), camera_name(camera_name_val), vehicle_name(vehicle_name_val)
         {
         }
     };
@@ -566,6 +567,11 @@ private:
             std::to_string(settings_json.getInt("CameraID", 0)));
     }
 
+    static std::string getVehicleName(const Settings& settings_json)
+    {
+        return settings_json.getString("VehicleName", "");
+    }
+
     static void loadRecordingSetting(const Settings& settings_json, RecordingSetting& recording_setting)
     {
         Settings recording_json;
@@ -707,7 +713,7 @@ private:
         auto vehicle_type = Utils::toLower(settings_json.getString("VehicleType", ""));
 
         std::unique_ptr<VehicleSetting> vehicle_setting;
-        if (vehicle_type == kVehicleTypePX4 || vehicle_type == kVehicleTypeArduCopterSolo 
+        if (vehicle_type == kVehicleTypePX4 || vehicle_type == kVehicleTypeArduCopterSolo
             || vehicle_type == kVehicleTypeArduCopter || vehicle_type == kVehicleTypeArduRover)
             vehicle_setting = createMavLinkVehicleSetting(settings_json);
         //for everything else we don't need derived class yet
@@ -1002,6 +1008,7 @@ private:
                         json_settings_child.getInt("ImageType", 0));
                     subwindow_setting.visible = json_settings_child.getBool("Visible", false);
                     subwindow_setting.camera_name = getCameraName(json_settings_child);
+                    subwindow_setting.vehicle_name = getVehicleName(json_settings_child);
                 }
             }
         }
@@ -1010,9 +1017,9 @@ private:
     static void initializeSubwindowSettings(std::vector<SubwindowSetting>& subwindow_settings)
     {
         subwindow_settings.clear();
-        subwindow_settings.push_back(SubwindowSetting(0, ImageType::DepthVis, false, "")); //depth
-        subwindow_settings.push_back(SubwindowSetting(0, ImageType::Segmentation, false, "")); //seg
-        subwindow_settings.push_back(SubwindowSetting(0, ImageType::Scene, false, "")); //vis
+        subwindow_settings.push_back(SubwindowSetting(0, ImageType::DepthVis, false, "", "")); //depth
+        subwindow_settings.push_back(SubwindowSetting(1, ImageType::Segmentation, false, "", "")); //seg
+        subwindow_settings.push_back(SubwindowSetting(2, ImageType::Scene, false, "", "")); //vis
     }
 
     void loadOtherSettings(const Settings& settings_json)
