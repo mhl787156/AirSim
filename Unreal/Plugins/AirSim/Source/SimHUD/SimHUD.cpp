@@ -317,6 +317,15 @@ void ASimHUD::initializeSubWindows()
         auto vehicle_sim_api = simmode_->getVehicleSimApi(subwindow_setting.vehicle_name);
 
         if (vehicle_sim_api) {
+            auto camera_count = vehicle_sim_api->getCameraCount();
+
+            //setup defaults
+            if (camera_count > 0) {
+                subwindow_cameras_[subwindow_setting.window_index] = vehicle_sim_api->getCamera("");
+            }
+            else
+                subwindow_cameras_[subwindow_setting.window_index] = nullptr;
+
             if (vehicle_sim_api->getCamera(subwindow_setting.camera_name)!=nullptr)
                 subwindow_cameras_[subwindow_setting.window_index] = vehicle_sim_api->getCamera(subwindow_setting.camera_name);
             else
@@ -324,8 +333,6 @@ void ASimHUD::initializeSubWindows()
                     std::to_string(window_index), LogDebugLevel::Failure);
         }
     }
-
-
 }
 
 
